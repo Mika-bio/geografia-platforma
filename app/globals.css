@@ -78,3 +78,20 @@ body {
 .prose-geo hr {
   @apply my-6 border-forest-200;
 }
+
+
+@media print {
+  header, footer, .print\:hidden, nav {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .kmzh-print {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+}

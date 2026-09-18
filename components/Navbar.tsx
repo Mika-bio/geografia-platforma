@@ -13,6 +13,7 @@ const links = [
   { href: "/pisa", label: "PISA" },
   { href: "/testter", label: "Тесттер" },
   { href: "/karta", label: "Карта" },
+  { href: "/ji", label: "ЖИ / КМЖ" },
   { href: "/natizheler", label: "Нәтижелер" },
 ];
 

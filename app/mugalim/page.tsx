@@ -95,6 +95,14 @@ export default function TeacherPage() {
       <h1 className="page-title mt-3">Мұғалім панелі</h1>
       <p className="page-subtitle">Сыныптар, оқушылар, тапсырмалар, рейтинг, статистика, CSV экспорт.</p>
 
+      <a href="/ji" className="card flex items-center justify-between gap-3 border-horizon-200 bg-gradient-to-r from-horizon-50 to-sky-50 hover:border-horizon-300">
+        <div>
+          <h2 className="font-serif text-lg font-bold text-forest-900">ЖИ / КМЖ жұмыс орны</h2>
+          <p className="text-sm text-mountain-600">Үлгі КМЖ, жоспар жасау және ЖИ көмекші — бір жерде.</p>
+        </div>
+        <span className="btn-primary shrink-0">Ашу</span>
+      </a>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="card space-y-3">
           <h2 className="font-serif text-lg font-bold">Сынып қосу</h2>
