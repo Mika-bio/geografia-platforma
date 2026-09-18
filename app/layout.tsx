@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
-import { Source_Serif_4, Manrope } from "next/font/google";
+import type { CSSProperties } from "react";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const serif = Source_Serif_4({
-  subsets: ["cyrillic", "latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
+/** Single Google font for faster first paint; serif uses system stack */
 const sans = Manrope({
-  subsets: ["cyrillic", "latin"],
+  subsets: ["latin", "cyrillic"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -26,11 +22,15 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const serifStyle = {
+    ["--font-serif"]: 'Georgia, "Times New Roman", ui-serif, serif',
+  } as CSSProperties;
+
   return (
     <html lang="kk">
-      <body className={`${serif.variable} ${sans.variable} font-sans antialiased`}>
+      <body className={`${sans.variable} font-sans antialiased`} style={serifStyle}>
         <AuthProvider>
-          <div className="flex min-h-screen flex-col bg-mountain-gradient bg-leaf-pattern">
+          <div className="geo-canvas flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

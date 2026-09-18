@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getTopicsByGrade } from "@/lib/topics";
+import { getTopicsMetaByGrade } from "@/lib/topics-meta";
 import { generateKmzhStructured, type KmzhGenerateInput } from "@/lib/kmzh-generator";
 import type { KmzhSample } from "@/lib/data/kmzh-samples";
 import KmzhViewer from "./KmzhViewer";
@@ -14,7 +14,7 @@ export default function KmzhGeneratorForm() {
   const [maqsat, setMaqsat] = useState("");
   const [result, setResult] = useState<KmzhSample | null>(null);
 
-  const topics = useMemo(() => getTopicsByGrade(synyp), [synyp]);
+  const topics = useMemo(() => getTopicsMetaByGrade(synyp), [synyp]);
 
   function generate() {
     const selected = topics.find((t) => t.id === topicId);

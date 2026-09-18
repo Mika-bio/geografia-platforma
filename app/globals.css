@@ -3,12 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #153d29;
-  --background: #f4f8f6;
+  --foreground: #07283d;
+  --background: #F4F1DE;
+  --navy: #0B3D5C;
+  --teal: #1A7A6D;
+  --gold: #E9C46A;
+  --cream: #F4F1DE;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -17,47 +34,63 @@ body {
   min-height: 100vh;
 }
 
+/* Lightweight abstract geography canvas (CSS + tiny inline SVG via data URI) */
+.geo-canvas {
+  background-color: #F4F1DE;
+  background-image:
+    linear-gradient(165deg, #F4F1DE 0%, #eef4f8 42%, #e8f4f1 78%, #F4F1DE 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600' fill='none'%3E%3Ccircle cx='640' cy='90' r='120' stroke='%230B3D5C' stroke-opacity='0.08' stroke-width='1.5'/%3E%3Ccircle cx='640' cy='90' r='80' stroke='%231A7A6D' stroke-opacity='0.10' stroke-width='1.2'/%3E%3Ccircle cx='640' cy='90' r='45' stroke='%23E9C46A' stroke-opacity='0.18' stroke-width='1'/%3E%3Cpath d='M40 420 C120 380 180 460 260 430 S400 390 480 440 S620 480 760 430' stroke='%230B3D5C' stroke-opacity='0.07' stroke-width='1.2' fill='none'/%3E%3Cpath d='M20 460 C100 430 160 500 250 470 S390 430 470 480 S610 520 780 470' stroke='%231A7A6D' stroke-opacity='0.08' stroke-width='1' fill='none'/%3E%3Cpath d='M60 500 C140 470 200 540 290 510 S420 470 510 520' stroke='%23E9C46A' stroke-opacity='0.12' stroke-width='1' fill='none'/%3E%3Cpath d='M120 80 Q200 40 280 90 T440 70' stroke='%230B3D5C' stroke-opacity='0.06' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, min(900px, 100%) auto;
+  background-position: center, top right;
+}
+
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-forest-600 to-forest-700 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:from-forest-700 hover:to-forest-800 hover:shadow-card focus:outline-none focus:ring-2 focus:ring-forest-400 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-navy-700 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-forest-200/80 bg-white/90 px-5 py-2.5 text-sm font-semibold text-forest-800 shadow-sm backdrop-blur-sm transition hover:border-forest-300 hover:bg-forest-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-navy-200 bg-white px-5 py-2.5 text-sm font-semibold text-navy-800 shadow-sm transition hover:border-teal-300 hover:bg-teal-50;
   }
   .card {
-    @apply rounded-2xl border border-white/70 bg-card-shine p-6 shadow-soft backdrop-blur-[2px] transition duration-300 hover:-translate-y-0.5 hover:border-forest-200/80 hover:shadow-glow;
+    @apply rounded-2xl border border-navy-100/80 bg-white p-6 shadow-soft transition;
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .card:hover {
+      @apply -translate-y-0.5 border-teal-200 shadow-card;
+    }
   }
   .input-field {
-    @apply w-full rounded-xl border border-forest-200/80 bg-white/95 px-4 py-2.5 text-sm text-forest-900 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200;
+    @apply w-full rounded-xl border border-navy-200/80 bg-white px-4 py-2.5 text-sm text-navy-900 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-200;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-forest-800;
+    @apply mb-1.5 block text-sm font-medium text-navy-800;
   }
   .page-title {
-    @apply font-serif text-3xl font-bold tracking-tight text-forest-900 sm:text-4xl;
+    @apply font-serif text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl;
   }
   .page-subtitle {
     @apply mt-2 max-w-2xl text-mountain-600;
   }
   .section-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-forest-200/60 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-700 shadow-sm backdrop-blur-sm;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-navy-200/70 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-navy-700 shadow-sm;
   }
 }
 
-/* Nature / journey decorative mountain silhouette */
+/* Soft contour divider — lightweight SVG, no blur */
 .mountain-divider {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,80 L150,40 L300,70 L450,20 L600,60 L750,30 L900,65 L1050,25 L1200,55 L1200,120 L0,120 Z' fill='%23d5eee0'/%3E%3Cpath d='M0,100 L200,60 L400,90 L600,45 L800,85 L1000,50 L1200,80 L1200,120 L0,120 Z' fill='%23aeddbf' opacity='0.75'/%3E%3Cpath d='M0,110 L250,85 L500,105 L750,70 L1000,100 L1200,90 L1200,120 L0,120 Z' fill='%23ffefd4' opacity='0.55'/%3E%3C/svg%3E")
-    no-repeat bottom center / 100% 90px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0,50 C150,20 300,70 450,40 S750,10 900,45 S1100,70 1200,35 L1200,80 L0,80 Z' fill='%23ffffff' fill-opacity='0.55'/%3E%3Cpath d='M0,60 C200,35 400,75 600,50 S1000,30 1200,55 L1200,80 L0,80 Z' fill='%231A7A6D' fill-opacity='0.08'/%3E%3C/svg%3E")
+    no-repeat bottom center / 100% 70px;
 }
 
 .prose-geo h1 {
-  @apply font-serif text-2xl font-bold text-forest-900 mb-4;
+  @apply font-serif text-2xl font-bold text-navy-900 mb-4;
 }
 .prose-geo h2 {
-  @apply font-serif text-xl font-bold text-forest-800 mt-6 mb-3;
+  @apply font-serif text-xl font-bold text-navy-800 mt-6 mb-3;
 }
 .prose-geo h3 {
-  @apply font-serif text-lg font-semibold text-forest-700 mt-4 mb-2;
+  @apply font-serif text-lg font-semibold text-teal-700 mt-4 mb-2;
 }
 .prose-geo p {
   @apply mb-3 text-mountain-700 leading-relaxed;
@@ -70,15 +103,14 @@ body {
 }
 .prose-geo th,
 .prose-geo td {
-  @apply border border-forest-200 px-3 py-2 text-left;
+  @apply border border-navy-200 px-3 py-2 text-left;
 }
 .prose-geo th {
-  @apply bg-forest-50 font-semibold;
+  @apply bg-teal-50 font-semibold;
 }
 .prose-geo hr {
-  @apply my-6 border-forest-200;
+  @apply my-6 border-navy-200;
 }
-
 
 @media print {
   header, footer, .print\:hidden, nav {

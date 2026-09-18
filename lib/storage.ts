@@ -106,9 +106,16 @@ export function getRewards(): RewardsState {
   }
 }
 
+export const REWARDS_EVENT = "geopro-rewards-updated";
+
 export function setRewards(r: RewardsState) {
   if (!browser()) return;
   localStorage.setItem(KEYS.rewards, JSON.stringify(r));
+  try {
+    window.dispatchEvent(new CustomEvent(REWARDS_EVENT));
+  } catch {
+    /* ignore */
+  }
 }
 
 export type BadgeDef = {

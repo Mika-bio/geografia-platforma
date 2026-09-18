@@ -1,3 +1,4 @@
+/** Full topic payloads (~370KB). Prefer @/lib/topics-meta for listings. */
 import data from "./data/topics.json";
 
 export type QA = {

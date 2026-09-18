@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BarChart3 } from "lucide-react";
 import RewardsBar from "@/components/RewardsBar";
 import { getResults, ResultEntry, getCompletedTopics, getProfile } from "@/lib/storage";
-import { topicsGrade8, topicsGrade9 } from "@/lib/topics";
+import { TOTAL_TOPICS } from "@/lib/topics-meta";
 
 export default function ResultsPage() {
   const [results, setResults] = useState<ResultEntry[]>([]);
@@ -35,7 +35,7 @@ export default function ResultsPage() {
       avgPisa: avg(byType("pisa")),
       weakList,
       completed: completed.length,
-      totalTopics: topicsGrade8.length + topicsGrade9.length,
+      totalTopics: TOTAL_TOPICS,
     };
   }, [results, completed]);
 

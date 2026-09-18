@@ -4,7 +4,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
-import { getTopicsByGrade } from "@/lib/topics";
+import { getTopicsMetaByGrade } from "@/lib/topics-meta";
 import { getCompletedTopics, getProfile } from "@/lib/storage";
 
 export default function TopicsPage() {
@@ -17,7 +17,7 @@ export default function TopicsPage() {
     setDone(getCompletedTopics());
   }, []);
 
-  const topics = getTopicsByGrade(grade);
+  const topics = getTopicsMetaByGrade(grade);
 
   return (
     <RequireAuth>
