@@ -5,15 +5,16 @@ export type User = {
   login: string;
   password: string;
   rol: "оқушы" | "мұғалім";
+  grade?: 8 | 9;
   createdAt: string;
 };
 
 export type SessionUser = Omit<User, "password">;
 
-const STORAGE_KEY = "geosayahat_users";
-const SESSION_KEY = "geosayahat_session";
-const LEGACY_STORAGE = "geoalemi_users";
-const LEGACY_SESSION = "geoalemi_session";
+const STORAGE_KEY = "geopro_users";
+const SESSION_KEY = "geopro_session";
+const LEGACY = ["geosayahat_users", "geoalemi_users"];
+const LEGACY_SESSION = ["geosayahat_session", "geoalemi_session"];
 
 export const SEED_USERS: User[] = [
   {
@@ -32,6 +33,7 @@ export const SEED_USERS: User[] = [
     login: "erlan.k",
     password: "okushy2024",
     rol: "оқушы",
+    grade: 8,
     createdAt: "2024-09-01T00:00:00.000Z",
   },
   {
@@ -41,6 +43,7 @@ export const SEED_USERS: User[] = [
     login: "dana.s",
     password: "geo2024",
     rol: "оқушы",
+    grade: 9,
     createdAt: "2024-09-01T00:00:00.000Z",
   },
 ];
@@ -52,12 +55,22 @@ function isBrowser() {
 function migrateLegacy() {
   if (!isBrowser()) return;
   if (!localStorage.getItem(STORAGE_KEY)) {
-    const legacy = localStorage.getItem(LEGACY_STORAGE);
-    if (legacy) localStorage.setItem(STORAGE_KEY, legacy);
+    for (const k of LEGACY) {
+      const legacy = localStorage.getItem(k);
+      if (legacy) {
+        localStorage.setItem(STORAGE_KEY, legacy);
+        break;
+      }
+    }
   }
   if (!localStorage.getItem(SESSION_KEY)) {
-    const legacy = localStorage.getItem(LEGACY_SESSION);
-    if (legacy) localStorage.setItem(SESSION_KEY, legacy);
+    for (const k of LEGACY_SESSION) {
+      const legacy = localStorage.getItem(k);
+      if (legacy) {
+        localStorage.setItem(SESSION_KEY, legacy);
+        break;
+      }
+    }
   }
 }
 
@@ -98,6 +111,7 @@ export function registerUser(data: {
   login: string;
   password: string;
   rol: "оқушы" | "мұғалім";
+  grade?: 8 | 9;
 }): { ok: true; user: User } | { ok: false; error: string } {
   if (!isBrowser()) return { ok: false, error: "Браузер қажет." };
   const users = getUsers();
@@ -117,10 +131,10 @@ export function registerUser(data: {
     login: data.login.trim(),
     password: data.password,
     rol: data.rol,
+    grade: data.grade,
     createdAt: new Date().toISOString(),
   };
-  const next = [...users, user];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...users, user]));
   setSession(user);
   return { ok: true, user };
 }
@@ -134,9 +148,7 @@ export function loginUser(
   const user = users.find(
     (u) => u.login.toLowerCase() === login.toLowerCase() && u.password === password
   );
-  if (!user) {
-    return { ok: false, error: "Логин немесе құпия сөз қате." };
-  }
+  if (!user) return { ok: false, error: "Логин немесе құпия сөз қате." };
   setSession(user);
   return { ok: true, user };
 }
@@ -149,6 +161,7 @@ export function setSession(user: User) {
     zhoni: user.zhoni,
     login: user.login,
     rol: user.rol,
+    grade: user.grade,
     createdAt: user.createdAt,
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(safe));

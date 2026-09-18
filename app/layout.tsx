@@ -18,16 +18,14 @@ const sans = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Географияға саяхат — 8–9 сынып",
+  title: "GEOGRAPHY PRO — 8–9 сынып | Олимпиада • PISA • Тест",
   description:
-    "Қазақстан мектептеріне арналған география саяхаты: карталар, ЖИ КМЖ/БЖБ/ТЖБ, PISA, олимпиада, тесттер.",
+    "GEOGRAPHIC WORLD & PISA — Қазақстан 8–9 сынып география платформасы: тақырыптар, олимпиада, PISA, тесттер, интерактивті карта.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="kk">
       <body className={`${serif.variable} ${sans.variable} font-sans antialiased`}>

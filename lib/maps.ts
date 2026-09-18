@@ -1,101 +1,38 @@
-export type MapType = {
-  id: string;
-  title: string;
-  description: string;
-  uses: string[];
-  color: string;
-  icon: string;
+import data from "./data/maps.json";
+
+export type MapPoint = { id: string; name: string; x: number; y: number };
+
+export type MapData = {
+  kazakhstan: {
+    oblasts: MapPoint[];
+    rivers: MapPoint[];
+    lakes: MapPoint[];
+    mountains: MapPoint[];
+    minerals: MapPoint[];
+    zones: MapPoint[];
+  };
+  world: {
+    countries: MapPoint[];
+    mountains: MapPoint[];
+    rivers: MapPoint[];
+    lakes: MapPoint[];
+  };
 };
 
-export const mapTypes: MapType[] = [
-  {
-    id: "physical",
-    title: "Физикалық карта",
-    description:
-      "Жер бедерінің биіктігін, тауларды, жазықтарды, өзен-көлдерді түстермен көрсетеді. Жасыл — ойпат, қоңыр — тау.",
-    uses: ["Рельефті зерттеу", "Гидрографияны оқу", "Саяхат жоспарлау"],
-    color: "forest",
-    icon: "mountain",
-  },
-  {
-    id: "political",
-    title: "Саяси карта",
-    description:
-      "Мемлекеттердің шекарасы, астаналары, ірі қалалары бейнеленеді. Әкімшілік бөліністі түсінуге көмектеседі.",
-    uses: ["Елдерді салыстыру", "Шекараларды білу", "Геосаясат"],
-    color: "sky",
-    icon: "globe",
-  },
-  {
-    id: "thematic",
-    title: "Тақырыптық карта",
-    description:
-      "Бір тақырыпқа арналған карта: халық тығыздығы, өнеркәсіп, ауыл шаруашылығы, экология және т.б.",
-    uses: ["Статистиканы визуалдау", "Зерттеу жобалары", "Салыстырмалы талдау"],
-    color: "earth",
-    icon: "layers",
-  },
-  {
-    id: "climate",
-    title: "Климаттық карта",
-    description:
-      "Температура, жауын-шашын, жел, климаттық белдеулер көрсетіледі. Изотерма мен изогиета қолданылады.",
-    uses: ["Климатты салыстыру", "Ауыл шаруашылығы", "Ауа райы үрдістері"],
-    color: "sky",
-    icon: "cloud",
-  },
-  {
-    id: "geological",
-    title: "Геологиялық карта",
-    description:
-      "Тау жыныстарының жасы мен түрі, жарылымдар, пайдалы қазба орындары бейнеленеді.",
-    uses: ["Кен орындарын іздеу", "Сейсмика", "Инженерлік геология"],
-    color: "earth",
-    icon: "pickaxe",
-  },
-  {
-    id: "gis",
-    title: "ГАЖ карталары",
-    description:
-      "Геоақпараттық жүйелерде қабаттарды біріктіріп интерактивті карта жасау. Деректерді талдау мүмкіндігі жоғары.",
-    uses: ["Қала жоспарлау", "Экологиялық мониторинг", "Көлік логистикасы"],
-    color: "forest",
-    icon: "cpu",
-  },
-  {
-    id: "remote",
-    title: "Қашықтықтан зондтау",
-    description:
-      "Спутник пен ұшақ суреттерінен алынған кескіндер. Өсімдік жамылғысы, су, өрт, құрғақшылық бақыланады.",
-    uses: ["Апаттарды бақылау", "Ауыл шаруашылығы", "Орман мониторингі"],
-    color: "mountain",
-    icon: "satellite",
-  },
-  {
-    id: "topo",
-    title: "Топографиялық карта",
-    description:
-      "Ірі масштабты карта: горизонтальдар, биіктік белгілері, жергілікті объектілер толық көрсетіледі.",
-    uses: ["Жорық", "Әскери іс", "Құрылыс жобалау"],
-    color: "forest",
-    icon: "map",
-  },
-  {
-    id: "soil",
-    title: "Топырақ картасы",
-    description:
-      "Топырақ типтері мен құнарлылығы. Қазақстанда қара топырақтан сор топыраққа дейін зоналылық байқалады.",
-    uses: ["Ауыл шаруашылығы", "Мелиорация", "Экология"],
-    color: "earth",
-    icon: "sprout",
-  },
-  {
-    id: "econ",
-    title: "Экономикалық карта",
-    description:
-      "Өнеркәсіп орталықтары, көлік тораптары, ресурстар мен сауда ағындары бейнеленеді.",
-    uses: ["Экономикалық география", "Инвестиция", "Аймақтық даму"],
-    color: "sky",
-    icon: "factory",
-  },
-];
+export const mapData = data as MapData;
+
+export const kzLayers = [
+  { key: "oblasts", label: "Облыстар" },
+  { key: "rivers", label: "Өзендер" },
+  { key: "lakes", label: "Көлдер" },
+  { key: "mountains", label: "Таулар" },
+  { key: "minerals", label: "Пайдалы қазбалар" },
+  { key: "zones", label: "Табиғат зоналары" },
+] as const;
+
+export const worldLayers = [
+  { key: "countries", label: "Елдер" },
+  { key: "mountains", label: "Таулар" },
+  { key: "rivers", label: "Өзендер" },
+  { key: "lakes", label: "Көлдер" },
+] as const;

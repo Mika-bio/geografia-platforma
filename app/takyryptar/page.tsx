@@ -1,50 +1,47 @@
+"use client";
+
 import Link from "next/link";
-import { curriculum } from "@/lib/curriculum";
+import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
+import { getTopicsByGrade } from "@/lib/topics";
+import { getCompletedTopics, getProfile } from "@/lib/storage";
 
-const tint: Record<string, string> = {
-  forest: "border-forest-200 bg-forest-50/80",
-  earth: "border-earth-200 bg-earth-50/80",
-  sky: "border-sky-200 bg-sky-50/80",
-  mountain: "border-mountain-200 bg-mountain-50/80",
-};
+export default function TopicsPage() {
+  const [grade, setGrade] = useState<8 | 9>(8);
+  const [done, setDone] = useState<string[]>([]);
 
-export default function TakyryptarPage() {
+  useEffect(() => {
+    const p = getProfile();
+    if (p?.grade) setGrade(p.grade);
+    setDone(getCompletedTopics());
+  }, []);
+
+  const topics = getTopicsByGrade(grade);
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
-      <span className="section-badge">
-        <BookOpen className="h-3.5 w-3.5" />
-        Оқулық мазмұны
-      </span>
-      <h1 className="page-title mt-3">Тақырыптар</h1>
-      <p className="page-subtitle">
-        Кіріспеден терминдер сөздігіне дейін — әр § бойынша қысқаша қазақша шолу.
-      </p>
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <span className="section-badge"><BookOpen className="h-3.5 w-3.5" /> Тақырыптар</span>
+      <h1 className="page-title mt-3">Тақырыптар · {grade} сынып</h1>
+      <p className="page-subtitle">Әр тақырыпта: теория, 12 практика, карта тапсырмасы, 5 тест.</p>
 
-      <div className="mt-10 space-y-10">
-        {curriculum.map((cat) => (
-          <section key={cat.id}>
-            <div className={`rounded-2xl border p-5 ${tint[cat.color] || tint.forest}`}>
-              <h2 className="font-serif text-2xl font-bold text-forest-900">
-                {cat.title}
-              </h2>
-              <p className="mt-1 text-sm text-mountain-700">{cat.description}</p>
+      <div className="mt-6 flex gap-2">
+        {[8, 9].map((g) => (
+          <button key={g} onClick={() => setGrade(g as 8 | 9)} className={`rounded-full px-4 py-2 text-sm font-semibold ${grade === g ? "bg-forest-600 text-white" : "bg-white text-forest-800 border border-forest-200"}`}>
+            {g} сынып ({g === 8 ? 25 : 27})
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {topics.map((t, i) => (
+          <Link key={t.id} href={`/takyryptar/${t.id}`} className="card block">
+            <div className="flex items-start justify-between gap-2">
+              <span className="rounded-lg bg-forest-100 px-2 py-0.5 text-xs font-bold text-forest-700">{i + 1}</span>
+              {done.includes(t.id) && <span className="text-xs font-semibold text-forest-600">✓ Аяқталды</span>}
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {cat.sections.map((s) => (
-                <Link
-                  key={s.id}
-                  href={`/takyryptar/${s.id}`}
-                  className="rounded-xl border border-forest-100 bg-white p-4 shadow-soft transition hover:border-forest-300 hover:shadow-card"
-                >
-                  <h3 className="font-serif font-bold text-forest-900">{s.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-mountain-600">
-                    {s.summary}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </section>
+            <h2 className="mt-2 font-serif text-base font-bold text-forest-900">{t.title}</h2>
+            <p className="mt-1 text-xs text-mountain-500">{t.category} · теория + практика + карта + тест</p>
+          </Link>
         ))}
       </div>
     </div>

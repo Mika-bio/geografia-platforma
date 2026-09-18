@@ -1,155 +1,117 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { olympiadQuestions, topicLabels } from "@/lib/olympiad";
-import { Trophy, CheckCircle2, XCircle, Lightbulb } from "lucide-react";
+import { Trophy } from "lucide-react";
+import QuizEngine from "@/components/QuizEngine";
+import { getOlympiadByLevel, levelMeta, OlympiadItem } from "@/lib/olympiad";
+import { addResult, getProfile } from "@/lib/storage";
 
-type TopicFilter = "all" | "litosfera" | "atmosfera" | "gidrosfera" | "kartografia";
-
-export default function OlimpiadaPage() {
-  const [topic, setTopic] = useState<TopicFilter>("all");
-  const [idx, setIdx] = useState(0);
-  const [chosen, setChosen] = useState<number | null>(null);
-  const [show, setShow] = useState(false);
-
-  const list = useMemo(() => {
-    if (topic === "all") return olympiadQuestions;
-    return olympiadQuestions.filter((q) => q.topic === topic);
-  }, [topic]);
-
-  const q = list[idx % list.length];
-
-  function changeTopic(t: TopicFilter) {
-    setTopic(t);
-    setIdx(0);
-    setChosen(null);
-    setShow(false);
+function ExtraVisual({ item }: { item: OlympiadItem }) {
+  if (item.chart) {
+    const maxT = Math.max(...item.chart.temp.map(Math.abs), 1);
+    const maxP = Math.max(...item.chart.precip, 1);
+    return (
+      <div className="mb-4 rounded-xl border border-sky-100 bg-sky-50/60 p-4">
+        <p className="mb-2 text-xs font-semibold text-sky-800">Климат диаграммасы (SVG)</p>
+        <svg viewBox="0 0 320 120" className="h-28 w-full">
+          {item.chart.months.map((m, i) => {
+            const x = 40 + i * 70;
+            const h = (item.chart!.precip[i] / maxP) * 50;
+            const ty = 60 - (item.chart!.temp[i] / maxT) * 40;
+            return (
+              <g key={m}>
+                <rect x={x} y={100 - h} width={24} height={h} fill="#7bc69a" opacity={0.8} />
+                <circle cx={x + 12} cy={ty} r={4} fill="#2f83bd" />
+                <text x={x + 12} y={115} textAnchor="middle" fontSize="10" fill="#40495e">{m}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
   }
-
-  function check() {
-    setShow(true);
+  if (item.table) {
+    return (
+      <div className="mb-4 overflow-x-auto rounded-xl border border-forest-100">
+        <table className="w-full text-sm">
+          <thead className="bg-forest-50">
+            <tr>{item.table.headers.map((h) => <th key={h} className="px-3 py-2 text-left">{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {item.table.rows.map((r, i) => (
+              <tr key={i} className="border-t border-forest-100">
+                {r.map((c, j) => <td key={j} className="px-3 py-2">{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   }
+  return null;
+}
 
-  function next() {
-    setIdx((i) => (i + 1) % list.length);
-    setChosen(null);
-    setShow(false);
-  }
+export default function OlympiadPage() {
+  const [level, setLevel] = useState<1 | 2 | 3 | null>(null);
+  const items = useMemo(() => (level ? getOlympiadByLevel(level) : []), [level]);
 
-  if (!q) {
-    return <div className="p-12 text-center">Сұрақтар жоқ</div>;
+  // Enrich questions text with type tag already in data
+  const quizItems = items.map((it) => ({
+    id: it.id,
+    question: `[${it.type}] ${it.question}`,
+    options: it.options,
+    answer: it.answer,
+    explanation: it.explanation,
+  }));
+
+  function onFinish(result: { correct: number; total: number; percent: number; score: number; wrong: { question: string; your?: string; correct: string; explanation: string }[] }) {
+    const profile = getProfile();
+    addResult({
+      name: profile?.name || "Оқушы",
+      grade: profile?.grade || 8,
+      type: "olympiad",
+      title: `Олимпиада · деңгей ${level}`,
+      correct: result.correct,
+      total: result.total,
+      percent: result.percent,
+      score: result.score,
+      xp: Math.max(15, Math.round(result.percent / 3)),
+      wrong: result.wrong,
+    });
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <span className="section-badge">
-        <Trophy className="h-3.5 w-3.5" />
-        Олимпиада
-      </span>
+    <div className="mx-auto max-w-4xl px-4 py-10">
+      <span className="section-badge"><Trophy className="h-3.5 w-3.5" /> Олимпиада</span>
       <h1 className="page-title mt-3">Олимпиадаға дайындық</h1>
       <p className="page-subtitle">
-        Көп сатылы, күрделі сұрақтар — литосфера, атмосфера, гидросфера, картография.
+        Үш деңгей: карта, координаталар, масштаб, қашықтық, уақыт белдеулері, климат диаграммалары,
+        кестелер, салыстыру, себеп-салдар, көп дұрыс, логика.
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {(Object.keys(topicLabels) as TopicFilter[]).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => changeTopic(t)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              topic === t
-                ? "bg-earth-600 text-white"
-                : "bg-earth-50 text-earth-900 hover:bg-earth-100"
-            }`}
-          >
-            {topicLabels[t]}
-          </button>
-        ))}
-      </div>
-
-      <article className="card mt-8">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-          <span className="rounded-full bg-earth-100 px-2.5 py-1 text-earth-800">
-            {topicLabels[q.topic]}
-          </span>
-          <span className="rounded-full bg-red-50 px-2.5 py-1 text-red-700">
-            {q.difficulty}
-          </span>
-          <span className="text-mountain-500">
-            {idx + 1} / {list.length}
-          </span>
-        </div>
-
-        <h2 className="mt-4 font-serif text-xl font-bold text-forest-900 leading-snug">
-          {q.question}
-        </h2>
-
-        {q.steps && (
-          <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 p-4">
-            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900">
-              <Lightbulb className="h-4 w-4" />
-              Ойлау қадамдары (кеңес)
-            </p>
-            <ul className="space-y-1 text-sm text-amber-900/90">
-              {q.steps.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="mt-5 space-y-2">
-          {q.options.map((opt, oi) => (
-            <button
-              key={oi}
-              type="button"
-              onClick={() => !show && setChosen(oi)}
-              className={`flex w-full items-start gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
-                chosen === oi ? "border-earth-500 bg-earth-50" : "border-forest-100 bg-white hover:border-earth-300"
-              } ${show && oi === q.answer ? "border-green-500 bg-green-50" : ""}
-              ${show && chosen === oi && oi !== q.answer ? "border-red-400 bg-red-50" : ""}`}
-            >
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-white text-xs font-bold">
-                {String.fromCharCode(65 + oi)}
-              </span>
-              {opt}
+      {!level ? (
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          {levelMeta.map((l) => (
+            <button key={l.level} onClick={() => setLevel(l.level)} className="card text-left">
+              <p className="text-xs font-bold uppercase text-horizon-700">Деңгей {l.level}</p>
+              <h2 className="mt-1 font-serif text-xl font-bold text-forest-900">{l.title}</h2>
+              <p className="mt-2 text-sm text-mountain-600">{l.desc}</p>
+              <p className="mt-3 text-xs text-forest-700">{getOlympiadByLevel(l.level).length} тапсырма</p>
             </button>
           ))}
         </div>
-
-        {show && (
-          <p
-            className={`mt-4 flex items-start gap-2 rounded-xl p-3 text-sm ${
-              chosen === q.answer ? "bg-green-50 text-green-800" : "bg-amber-50 text-amber-900"
-            }`}
-          >
-            {chosen === q.answer ? (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-            ) : (
-              <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            )}
-            {q.explanation}
-          </p>
-        )}
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          {!show ? (
-            <button
-              type="button"
-              className="btn-primary"
-              disabled={chosen === null}
-              onClick={check}
-            >
-              Тексеру
-            </button>
-          ) : (
-            <button type="button" className="btn-primary" onClick={next}>
-              Келесі сұрақ
-            </button>
-          )}
+      ) : (
+        <div className="mt-8 space-y-4">
+          <button className="btn-secondary" onClick={() => setLevel(null)}>← Деңгейлер</button>
+          {items[0] && <ExtraVisual item={items.find((i) => i.chart || i.table) || items[0]} />}
+          <div className="flex flex-wrap gap-2 text-xs">
+            {Array.from(new Set(items.map((i) => i.type))).map((t) => (
+              <span key={t} className="rounded-full bg-forest-100 px-2 py-1 font-semibold text-forest-800">{t}</span>
+            ))}
+          </div>
+          <QuizEngine items={quizItems} title={levelMeta[level - 1].title} onFinish={onFinish} />
         </div>
-      </article>
+      )}
     </div>
   );
 }

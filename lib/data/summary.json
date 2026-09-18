@@ -1,0 +1,16 @@
+{
+  "topics8": 25,
+  "topics9": 27,
+  "practicePerTopic": 12,
+  "testsPerTopic": 5,
+  "tests8": 110,
+  "tests9": 110,
+  "olympiad": 30,
+  "olympiadByLevel": {
+    "1": 10,
+    "2": 12,
+    "3": 8
+  },
+  "pisaScenarios": 6,
+  "pisaQuestions": 18
+}
