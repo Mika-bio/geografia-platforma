@@ -11,10 +11,10 @@ import {
 import {
   SessionUser,
   getSession,
+  getUsers,
   loginUser,
   logout as logoutFn,
   registerUser,
-  ensureSeedUsers,
 } from "@/lib/auth";
 
 type AuthContextValue = {
@@ -27,6 +27,7 @@ type AuthContextValue = {
     login: string;
     password: string;
     rol: "оқушы" | "мұғалім";
+    grade?: 8 | 9;
   }) => { ok: boolean; error?: string };
   logout: () => void;
   refresh: () => void;
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   const refresh = useCallback(() => {
-    ensureSeedUsers();
+    getUsers();
     setUser(getSession());
   }, []);
 
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login: string;
       password: string;
       rol: "оқушы" | "мұғалім";
+      grade?: 8 | 9;
     }) => {
       const res = registerUser(data);
       if (res.ok) {

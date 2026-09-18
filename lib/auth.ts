@@ -15,38 +15,8 @@ const STORAGE_KEY = "geopro_users";
 const SESSION_KEY = "geopro_session";
 const LEGACY = ["geosayahat_users", "geoalemi_users"];
 const LEGACY_SESSION = ["geosayahat_session", "geoalemi_session"];
-
-export const SEED_USERS: User[] = [
-  {
-    id: "u1",
-    aty: "Айгүл",
-    zhoni: "Нұрланова",
-    login: "aigul.n",
-    password: "mugalim2024",
-    rol: "мұғалім",
-    createdAt: "2024-09-01T00:00:00.000Z",
-  },
-  {
-    id: "u2",
-    aty: "Ерлан",
-    zhoni: "Қасымов",
-    login: "erlan.k",
-    password: "okushy2024",
-    rol: "оқушы",
-    grade: 8,
-    createdAt: "2024-09-01T00:00:00.000Z",
-  },
-  {
-    id: "u3",
-    aty: "Дана",
-    zhoni: "Сейітова",
-    login: "dana.s",
-    password: "geo2024",
-    rol: "оқушы",
-    grade: 9,
-    createdAt: "2024-09-01T00:00:00.000Z",
-  },
-];
+const DEMO_CLEANUP_KEY = "geopro_demo_cleanup_v1";
+const KNOWN_DEMO_LOGINS = new Set(["aigul.n", "erlan.k", "dana.s"]);
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -74,35 +44,48 @@ function migrateLegacy() {
   }
 }
 
-export function ensureSeedUsers(): User[] {
-  if (!isBrowser()) return SEED_USERS;
-  migrateLegacy();
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
-    return [...SEED_USERS];
-  }
-  try {
-    const parsed = JSON.parse(raw) as User[];
-    if (!Array.isArray(parsed)) throw new Error("bad users");
-    const logins = new Set(parsed.map((u) => u.login));
-    let changed = false;
-    for (const seed of SEED_USERS) {
-      if (!logins.has(seed.login)) {
-        parsed.push(seed);
-        changed = true;
+/** One-time strip of known demo accounts from stored users. */
+function cleanupDemoUsersOnce(users: User[]): User[] {
+  if (!isBrowser()) return users;
+  if (localStorage.getItem(DEMO_CLEANUP_KEY)) return users;
+  const cleaned = users.filter(
+    (u) => !KNOWN_DEMO_LOGINS.has(u.login.toLowerCase())
+  );
+  localStorage.setItem(DEMO_CLEANUP_KEY, "1");
+  if (cleaned.length !== users.length) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
+    const session = localStorage.getItem(SESSION_KEY);
+    if (session) {
+      try {
+        const s = JSON.parse(session) as SessionUser;
+        if (s?.login && KNOWN_DEMO_LOGINS.has(s.login.toLowerCase())) {
+          localStorage.removeItem(SESSION_KEY);
+        }
+      } catch {
+        /* ignore */
       }
     }
-    if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-    return parsed;
-  } catch {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
-    return [...SEED_USERS];
   }
+  return cleaned;
 }
 
+/** Load registered users from localStorage only. Empty storage → []. No seeding. */
 export function getUsers(): User[] {
-  return ensureSeedUsers();
+  if (!isBrowser()) return [];
+  migrateLegacy();
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as User[];
+    if (!Array.isArray(parsed)) {
+      localStorage.removeItem(STORAGE_KEY);
+      return [];
+    }
+    return cleanupDemoUsersOnce(parsed);
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return [];
+  }
 }
 
 export function registerUser(data: {
@@ -146,7 +129,8 @@ export function loginUser(
   if (!isBrowser()) return { ok: false, error: "Браузер қажет." };
   const users = getUsers();
   const user = users.find(
-    (u) => u.login.toLowerCase() === login.toLowerCase() && u.password === password
+    (u) =>
+      u.login.toLowerCase() === login.toLowerCase() && u.password === password
   );
   if (!user) return { ok: false, error: "Логин немесе құпия сөз қате." };
   setSession(user);
@@ -169,7 +153,7 @@ export function setSession(user: User) {
 
 export function getSession(): SessionUser | null {
   if (!isBrowser()) return null;
-  ensureSeedUsers();
+  getUsers(); // migrate + optional demo cleanup
   const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {

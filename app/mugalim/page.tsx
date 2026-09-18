@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Users } from "lucide-react";
-import { useAuth } from "@/components/AuthProvider";
+import RequireAuth from "@/components/RequireAuth";
 import { getUsers } from "@/lib/auth";
 import {
   Assignment, TeacherClass, exportResultsCsv, getAssignments, getClasses,
@@ -11,8 +10,6 @@ import {
 } from "@/lib/storage";
 
 export default function TeacherPage() {
-  const { user, ready } = useAuth();
-  const router = useRouter();
   const [classes, setClasses] = useState<TeacherClass[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [className, setClassName] = useState("");
@@ -23,12 +20,9 @@ export default function TeacherPage() {
   const [assignTitle, setAssignTitle] = useState("");
 
   useEffect(() => {
-    if (!ready) return;
-    if (!user) { router.push("/login"); return; }
-    if (user.rol !== "мұғалім") { router.push("/"); return; }
     setClasses(getClasses());
     setAssignments(getAssignments());
-  }, [ready, user, router]);
+  }, []);
 
   const students = useMemo(() => getUsers().filter((u) => u.rol === "оқушы"), []);
   const results = useMemo(() => getResults(), []);
@@ -85,11 +79,8 @@ export default function TeacherPage() {
     URL.revokeObjectURL(url);
   }
 
-  if (!ready || !user || user.rol !== "мұғалім") {
-    return <div className="p-10 text-center text-mountain-600">Жүктелуде...</div>;
-  }
-
   return (
+    <RequireAuth role="мұғалім">
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-10">
       <span className="section-badge"><Users className="h-3.5 w-3.5" /> Мұғалім</span>
       <h1 className="page-title mt-3">Мұғалім панелі</h1>
@@ -171,5 +162,6 @@ export default function TeacherPage() {
         </div>
       </div>
     </div>
+    </RequireAuth>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import {
-  Trophy, GraduationCap, ClipboardList, BookOpen, Map, BarChart3, Play, Compass,
+  Trophy, GraduationCap, ClipboardList, BookOpen, Map, BarChart3, Play, Compass, LogIn,
 } from "lucide-react";
-import { getProfile, setProfile, StudentProfile } from "@/lib/storage";
+import { useAuth } from "@/components/AuthProvider";
 import RewardsBar from "@/components/RewardsBar";
 
 const links = [
@@ -18,27 +17,7 @@ const links = [
 ];
 
 export default function HomePage() {
-  const [profile, setLocal] = useState<StudentProfile | null>(null);
-  const [name, setName] = useState("");
-  const [grade, setGrade] = useState<8 | 9>(8);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const p = getProfile();
-    setLocal(p);
-    if (p) {
-      setName(p.name);
-      setGrade(p.grade);
-    }
-    setReady(true);
-  }, []);
-
-  function save() {
-    if (!name.trim()) return;
-    const p = { name: name.trim(), grade };
-    setProfile(p);
-    setLocal(p);
-  }
+  const { user, ready } = useAuth();
 
   return (
     <div>
@@ -67,42 +46,51 @@ export default function HomePage() {
                 олимпиадалық ойлау, PISA сценарийлері, тесттер және карта викторинасы.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/takyryptar" className="btn-primary">
-                  <Play className="h-4 w-4" /> Бастау
-                </Link>
-                <Link href="/olimpiada" className="btn-secondary">Олимпиада</Link>
-                <Link href="/pisa" className="btn-secondary">PISA</Link>
-                <Link href="/testter" className="btn-secondary">Тесттер</Link>
-                <Link href="/takyryptar" className="btn-secondary">Тақырыптар</Link>
-                <Link href="/natizheler" className="btn-secondary">Менің нәтижелерім</Link>
+                {ready && user ? (
+                  <>
+                    <Link href="/takyryptar" className="btn-primary">
+                      <Play className="h-4 w-4" /> Бастау
+                    </Link>
+                    <Link href="/olimpiada" className="btn-secondary">Олимпиада</Link>
+                    <Link href="/pisa" className="btn-secondary">PISA</Link>
+                    <Link href="/testter" className="btn-secondary">Тесттер</Link>
+                    <Link href="/natizheler" className="btn-secondary">Менің нәтижелерім</Link>
+                  </>
+                ) : (
+                  <Link href="/login" className="btn-primary">
+                    <LogIn className="h-4 w-4" /> Кіру / Тіркелу
+                  </Link>
+                )}
               </div>
             </div>
 
             <div className="w-full max-w-md rounded-2xl border border-white/70 bg-white/90 p-6 shadow-glow backdrop-blur">
-              <h2 className="font-serif text-xl font-bold text-forest-900">Оқушы профилі</h2>
-              <p className="mt-1 text-sm text-mountain-600">Бастамас бұрын аты-жөні мен сыныпты енгізіңіз (localStorage).</p>
-              <label className="label mt-4">Аты-жөні</label>
-              <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Мысалы: Айғаным Серік" />
-              <label className="label mt-3">Сынып</label>
-              <div className="flex gap-2">
-                {[8, 9].map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setGrade(g as 8 | 9)}
-                    className={`flex-1 rounded-xl border px-3 py-2 text-sm font-semibold ${
-                      grade === g ? "border-forest-500 bg-forest-50 text-forest-800" : "border-forest-100 bg-white"
-                    }`}
-                  >
-                    {g} сынып
-                  </button>
-                ))}
-              </div>
-              <button onClick={save} className="btn-primary mt-4 w-full">Сақтау және бастау</button>
-              {ready && profile && (
-                <p className="mt-3 text-center text-sm text-forest-700">
-                  Сәлем, <strong>{profile.name}</strong> · {profile.grade} сынып
-                </p>
+              {ready && user ? (
+                <>
+                  <h2 className="font-serif text-xl font-bold text-forest-900">Сәлем, {user.aty}!</h2>
+                  <p className="mt-1 text-sm text-mountain-600">
+                    {user.zhoni} · {user.rol}
+                    {user.grade ? ` · ${user.grade} сынып` : ""}
+                  </p>
+                  <Link href="/takyryptar" className="btn-primary mt-4 w-full justify-center">
+                    <Play className="h-4 w-4" /> Оқуға өту
+                  </Link>
+                  {user.rol === "мұғалім" && (
+                    <Link href="/mugalim" className="btn-secondary mt-2 w-full justify-center">
+                      Мұғалім панелі
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h2 className="font-serif text-xl font-bold text-forest-900">Кіру / Тіркелу</h2>
+                  <p className="mt-1 text-sm text-mountain-600">
+                    Алғаш рет — өз логин мен құпия сөзіңізбен тіркеліңіз. Кейін сол аккаунтпен кіріңіз.
+                  </p>
+                  <Link href="/login" className="btn-primary mt-4 w-full justify-center">
+                    <LogIn className="h-4 w-4" /> Кіру / Тіркелу
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -111,10 +99,10 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl space-y-8 px-4 py-10">
-        <RewardsBar />
+        {ready && user && <RewardsBar />}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {links.map((f) => (
-            <Link key={f.href} href={f.href} className="card group block">
+            <Link key={f.href} href={ready && user ? f.href : "/login"} className="card group block">
               <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${f.color} p-3 text-white shadow-md transition group-hover:scale-105`}>
                 <f.icon className="h-5 w-5" />
               </div>

@@ -83,7 +83,7 @@ export default function Navbar() {
             </div>
           ) : ready ? (
             <Link href="/login" className="hidden rounded-full bg-gradient-to-r from-forest-600 to-sky-600 px-4 py-1.5 text-sm font-semibold text-white sm:inline-flex">
-              Кіру
+              Кіру / Тіркелу
             </Link>
           ) : null}
           <button className="rounded-lg p-2 text-forest-700 xl:hidden" onClick={() => setOpen((v) => !v)} aria-label="Мәзір">
@@ -103,7 +103,7 @@ export default function Navbar() {
               <Link href="/mugalim" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium">Мұғалім</Link>
             )}
             <Link href={user ? "/natizheler" : "/login"} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-forest-700">
-              {user ? "Нәтижелер" : "Кіру"}
+              {user ? "Нәтижелер" : "Кіру / Тіркелу"}
             </Link>
             {user && (
               <button onClick={() => { logout(); setOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm text-red-700">Шығу</button>

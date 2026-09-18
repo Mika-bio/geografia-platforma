@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import { useMemo, useState } from "react";
 import { Trophy } from "lucide-react";
@@ -81,6 +82,7 @@ export default function OlympiadPage() {
   }
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-4xl px-4 py-10">
       <span className="section-badge"><Trophy className="h-3.5 w-3.5" /> Олимпиада</span>
       <h1 className="page-title mt-3">Олимпиадаға дайындық</h1>
@@ -113,5 +115,6 @@ export default function OlympiadPage() {
         </div>
       )}
     </div>
+    </RequireAuth>
   );
 }

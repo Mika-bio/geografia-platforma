@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import { useEffect, useMemo, useState } from "react";
 import { ClipboardList } from "lucide-react";
@@ -40,6 +41,7 @@ export default function TestsPage() {
   }
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-3xl px-4 py-10">
       <span className="section-badge"><ClipboardList className="h-3.5 w-3.5" /> Тесттер</span>
       <h1 className="page-title mt-3">Тест банктері</h1>
@@ -76,5 +78,6 @@ export default function TestsPage() {
         </div>
       )}
     </div>
+    </RequireAuth>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import { useState } from "react";
 import { GraduationCap } from "lucide-react";
@@ -114,6 +115,7 @@ export default function PisaPage() {
   }
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-4xl px-4 py-10">
       <span className="section-badge"><GraduationCap className="h-3.5 w-3.5" /> PISA</span>
       <h1 className="page-title mt-3">PISA сценарийлері</h1>
@@ -193,5 +195,6 @@ export default function PisaPage() {
         </div>
       )}
     </div>
+    </RequireAuth>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3 } from "lucide-react";
@@ -45,6 +46,7 @@ export default function ResultsPage() {
   ];
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-10">
       <span className="section-badge"><BarChart3 className="h-3.5 w-3.5" /> Нәтижелер</span>
       <h1 className="page-title mt-3">Менің нәтижелерім{name ? `: ${name}` : ""}</h1>
@@ -106,5 +108,6 @@ export default function ResultsPage() {
         </div>
       </div>
     </div>
+    </RequireAuth>
   );
 }

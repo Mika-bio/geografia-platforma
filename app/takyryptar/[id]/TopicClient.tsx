@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -36,6 +37,7 @@ export default function TopicClient({ topic }: { topic: Topic }) {
   ];
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-3xl px-4 py-10">
       <Link href="/takyryptar" className="inline-flex items-center gap-2 text-sm font-medium text-forest-700">
         <ArrowLeft className="h-4 w-4" /> Барлық тақырыптар
@@ -77,5 +79,6 @@ export default function TopicClient({ topic }: { topic: Topic }) {
         )}
       </div>
     </div>
+    </RequireAuth>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import { useState } from "react";
 import { BookOpen, FilePlus2, MessageSquareText, Sparkles } from "lucide-react";
@@ -22,6 +23,7 @@ export default function JiPage() {
   ];
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
       <div>
         <span className="section-badge">
@@ -82,5 +84,6 @@ export default function JiPage() {
 
       {tab === "ji" && <JiChat />}
     </div>
+    </RequireAuth>
   );
 }

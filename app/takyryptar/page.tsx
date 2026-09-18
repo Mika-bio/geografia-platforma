@@ -1,4 +1,5 @@
 "use client";
+import RequireAuth from "@/components/RequireAuth";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ export default function TopicsPage() {
   const topics = getTopicsByGrade(grade);
 
   return (
+    <RequireAuth>
     <div className="mx-auto max-w-7xl px-4 py-10">
       <span className="section-badge"><BookOpen className="h-3.5 w-3.5" /> Тақырыптар</span>
       <h1 className="page-title mt-3">Тақырыптар · {grade} сынып</h1>
@@ -45,5 +47,6 @@ export default function TopicsPage() {
         ))}
       </div>
     </div>
+    </RequireAuth>
   );
 }

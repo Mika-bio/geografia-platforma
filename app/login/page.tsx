@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { setProfile } from "@/lib/storage";
+import { getSession } from "@/lib/auth";
 
 export default function LoginPage() {
   const { login, register } = useAuth();
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">("register");
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     aty: "",
@@ -26,7 +27,14 @@ export default function LoginPage() {
     if (mode === "login") {
       const res = login(form.login, form.password);
       if (!res.ok) { setError(res.error || "Қате"); return; }
-      router.push("/");
+      const s = getSession();
+      if (s) {
+        setProfile({
+          name: `${s.aty} ${s.zhoni}`.trim(),
+          grade: (s.grade || 8) as 8 | 9,
+        });
+      }
+      router.push(s?.rol === "мұғалім" ? "/mugalim" : "/");
     } else {
       const res = register({
         aty: form.aty,
@@ -34,6 +42,7 @@ export default function LoginPage() {
         login: form.login,
         password: form.password,
         rol: form.rol,
+        grade: form.rol === "оқушы" ? form.grade : undefined,
       });
       if (!res.ok) { setError(res.error || "Қате"); return; }
       if (form.rol === "оқушы") {
@@ -46,7 +55,9 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-12">
       <h1 className="page-title text-center">Кіру / Тіркелу</h1>
-      <p className="mt-2 text-center text-sm text-mountain-600">localStorage арқылы сақталады</p>
+      <p className="mt-2 text-center text-sm text-mountain-600">
+        Алғаш рет — «Тіркелу» (өз логин/құпия сөз). Кейін — «Кіру».
+      </p>
       <div className="mt-6 flex gap-2">
         <button onClick={() => setMode("login")} className={`flex-1 rounded-xl py-2 text-sm font-semibold ${mode === "login" ? "bg-forest-600 text-white" : "bg-white border"}`}>Кіру</button>
         <button onClick={() => setMode("register")} className={`flex-1 rounded-xl py-2 text-sm font-semibold ${mode === "register" ? "bg-forest-600 text-white" : "bg-white border"}`}>Тіркелу</button>
@@ -90,9 +101,6 @@ export default function LoginPage() {
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button className="btn-primary w-full" type="submit">{mode === "login" ? "Кіру" : "Тіркелу"}</button>
-        <p className="text-center text-xs text-mountain-500">
-          Демо: aigul.n / mugalim2024 (мұғалім), erlan.k / okushy2024 (оқушы)
-        </p>
         <Link href="/" className="block text-center text-sm text-forest-700">Басты бет</Link>
       </form>
     </div>
