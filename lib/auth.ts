@@ -10,8 +10,10 @@ export type User = {
 
 export type SessionUser = Omit<User, "password">;
 
-const STORAGE_KEY = "geoalemi_users";
-const SESSION_KEY = "geoalemi_session";
+const STORAGE_KEY = "geosayahat_users";
+const SESSION_KEY = "geosayahat_session";
+const LEGACY_STORAGE = "geoalemi_users";
+const LEGACY_SESSION = "geoalemi_session";
 
 export const SEED_USERS: User[] = [
   {
@@ -47,15 +49,29 @@ function isBrowser() {
   return typeof window !== "undefined";
 }
 
+function migrateLegacy() {
+  if (!isBrowser()) return;
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    const legacy = localStorage.getItem(LEGACY_STORAGE);
+    if (legacy) localStorage.setItem(STORAGE_KEY, legacy);
+  }
+  if (!localStorage.getItem(SESSION_KEY)) {
+    const legacy = localStorage.getItem(LEGACY_SESSION);
+    if (legacy) localStorage.setItem(SESSION_KEY, legacy);
+  }
+}
+
 export function ensureSeedUsers(): User[] {
   if (!isBrowser()) return SEED_USERS;
+  migrateLegacy();
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
-    return SEED_USERS;
+    return [...SEED_USERS];
   }
   try {
     const parsed = JSON.parse(raw) as User[];
+    if (!Array.isArray(parsed)) throw new Error("bad users");
     const logins = new Set(parsed.map((u) => u.login));
     let changed = false;
     for (const seed of SEED_USERS) {
@@ -68,7 +84,7 @@ export function ensureSeedUsers(): User[] {
     return parsed;
   } catch {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
-    return SEED_USERS;
+    return [...SEED_USERS];
   }
 }
 
@@ -83,6 +99,7 @@ export function registerUser(data: {
   password: string;
   rol: "оқушы" | "мұғалім";
 }): { ok: true; user: User } | { ok: false; error: string } {
+  if (!isBrowser()) return { ok: false, error: "Браузер қажет." };
   const users = getUsers();
   if (users.some((u) => u.login.toLowerCase() === data.login.toLowerCase())) {
     return { ok: false, error: "Бұл логин бос емес. Басқасын таңдаңыз." };
@@ -102,8 +119,8 @@ export function registerUser(data: {
     rol: data.rol,
     createdAt: new Date().toISOString(),
   };
-  users.push(user);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+  const next = [...users, user];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   setSession(user);
   return { ok: true, user };
 }
@@ -112,6 +129,7 @@ export function loginUser(
   login: string,
   password: string
 ): { ok: true; user: User } | { ok: false; error: string } {
+  if (!isBrowser()) return { ok: false, error: "Браузер қажет." };
   const users = getUsers();
   const user = users.find(
     (u) => u.login.toLowerCase() === login.toLowerCase() && u.password === password
@@ -142,7 +160,9 @@ export function getSession(): SessionUser | null {
   const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as SessionUser;
+    const parsed = JSON.parse(raw) as SessionUser;
+    if (!parsed?.id || !parsed?.login) return null;
+    return parsed;
   } catch {
     return null;
   }

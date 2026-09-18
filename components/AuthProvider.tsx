@@ -34,6 +34,24 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function toSession(user: {
+  id: string;
+  aty: string;
+  zhoni: string;
+  login: string;
+  rol: "оқушы" | "мұғалім";
+  createdAt: string;
+}): SessionUser {
+  return {
+    id: user.id,
+    aty: user.aty,
+    zhoni: user.zhoni,
+    login: user.login,
+    rol: user.rol,
+    createdAt: user.createdAt,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [ready, setReady] = useState(false);
@@ -46,12 +64,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh();
     setReady(true);
+
+    const onStorage = (e: StorageEvent) => {
+      if (
+        e.key === "geosayahat_session" ||
+        e.key === "geosayahat_users" ||
+        e.key === "geoalemi_session" ||
+        e.key === "geoalemi_users"
+      ) {
+        refresh();
+      }
+    };
+    const onFocus = () => refresh();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [refresh]);
 
   const login = useCallback((loginName: string, password: string) => {
     const res = loginUser(loginName, password);
     if (res.ok) {
-      setUser({ id: res.user.id, aty: res.user.aty, zhoni: res.user.zhoni, login: res.user.login, rol: res.user.rol, createdAt: res.user.createdAt });
+      setUser(toSession(res.user));
       return { ok: true };
     }
     return { ok: false, error: res.error };
@@ -67,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }) => {
       const res = registerUser(data);
       if (res.ok) {
-        setUser({ id: res.user.id, aty: res.user.aty, zhoni: res.user.zhoni, login: res.user.login, rol: res.user.rol, createdAt: res.user.createdAt });
+        setUser(toSession(res.user));
         return { ok: true };
       }
       return { ok: false, error: res.error };

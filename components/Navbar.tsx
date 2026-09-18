@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   Menu,
   X,
-  Mountain,
+  Compass,
   LogOut,
   User,
   ChevronDown,
@@ -30,27 +30,29 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-forest-200/60 bg-white/90 backdrop-blur-md shadow-soft">
+    <header className="sticky top-0 z-50 border-b border-forest-200/50 bg-white/75 shadow-soft backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-forest-500 to-sky-500 text-white shadow-md">
-            <Mountain className="h-5 w-5" />
+        <Link href="/" className="group flex items-center gap-2.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 via-forest-500 to-horizon-500 text-white shadow-md ring-2 ring-white/60 transition group-hover:scale-105">
+            <Compass className="h-5 w-5" />
           </span>
-          <span className="font-serif text-lg font-bold text-forest-800 group-hover:text-forest-600 transition-colors sm:text-xl">
-            География Әлемі
+          <span className="font-serif text-lg font-bold text-forest-800 transition-colors group-hover:text-forest-600 sm:text-xl">
+            Географияға саяхат
           </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {links.map((l) => {
-            const active = pathname === l.href || (l.href !== "/" && pathname.startsWith(l.href));
+            const active =
+              pathname === l.href ||
+              (l.href !== "/" && pathname.startsWith(l.href));
             return (
               <Link
                 key={l.href}
                 href={l.href}
                 className={`rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-forest-100 text-forest-800"
+                    ? "bg-forest-100 text-forest-800 shadow-sm"
                     : "text-mountain-700 hover:bg-forest-50 hover:text-forest-700"
                 }`}
               >
@@ -65,7 +67,7 @@ export default function Navbar() {
             <div className="relative hidden sm:block">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-full border border-forest-200 bg-forest-50 px-3 py-1.5 text-sm text-forest-800 hover:bg-forest-100"
+                className="flex items-center gap-2 rounded-full border border-forest-200/80 bg-gradient-to-r from-forest-50 to-sky-50 px-3 py-1.5 text-sm text-forest-800 shadow-sm hover:from-forest-100 hover:to-sky-100"
               >
                 <User className="h-4 w-4" />
                 <span className="font-medium">
@@ -74,7 +76,7 @@ export default function Navbar() {
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-forest-100 bg-white py-2 shadow-card">
+                <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-forest-100 bg-white py-2 shadow-glow">
                   <Link
                     href="/dashboard"
                     onClick={() => setMenuOpen(false)}
@@ -101,7 +103,7 @@ export default function Navbar() {
           ) : ready ? (
             <Link
               href="/login"
-              className="hidden rounded-full bg-forest-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-forest-700 sm:inline-flex"
+              className="hidden rounded-full bg-gradient-to-r from-forest-600 to-sky-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-forest-700 hover:to-sky-700 sm:inline-flex"
             >
               Кіру
             </Link>
@@ -118,7 +120,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t border-forest-100 bg-white px-4 py-3 lg:hidden">
+        <div className="border-t border-forest-100 bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden">
           <div className="flex flex-col gap-1">
             {links.map((l) => (
               <Link

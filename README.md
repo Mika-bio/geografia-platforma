@@ -1,12 +1,12 @@
-# География Әлемі (GeoAI 8–9)
+# Географияға саяхат (8–9 сынып)
 
 Қазақстан мектептерінің **8–9 сынып** география мұғалімдері мен оқушыларына арналған веб-платформа.
 
-Nature aesthetic · Next.js 14 (App Router) · TypeScript · Tailwind CSS · lucide-react
+Nature / journey aesthetic · Next.js 14 (App Router) · TypeScript · Tailwind CSS · lucide-react · **Cloudflare Pages** (static export)
 
 ## English (short)
 
-Educational geography platform for Kazakhstan grades 8–9: map types, client-side AI lesson/assessment generators (КМЖ / БЖБ / ТЖБ), PISA-style tasks, olympiad practice, 40+ quizzes, and full textbook TOC topics. Auth persists in `localStorage`. UI is entirely in Kazakh Cyrillic.
+Educational geography journey platform for Kazakhstan grades 8–9: map types, client-side AI lesson/assessment generators (КМЖ / БЖБ / ТЖБ), PISA-style tasks, olympiad practice, 40+ quizzes, and full textbook TOC topics. Auth persists in `localStorage`. UI is entirely in Kazakh Cyrillic.
 
 ## Іске қосу
 
@@ -18,12 +18,23 @@ npm run dev
 
 Браузерде: [http://localhost:3000](http://localhost:3000)
 
-Өндірістік жинақ:
+## Статикалық экспорт (Cloudflare Pages)
+
+`next.config.mjs` ішінде `output: 'export'` және `images.unoptimized: true` қойылған. Жинау:
 
 ```bash
 npm run build
-npm start
 ```
+
+Нәтиже: `out/` қалтасы.
+
+Deploy (Cloudflare есептік жазбасы қажет — `wrangler login` немесе `CLOUDFLARE_API_TOKEN`):
+
+```bash
+npx wrangler pages deploy out --project-name=geografia-alemi
+```
+
+`wrangler@3` devDependency ретінде орнатылған (Node 20).
 
 ## Маршруттар (routes)
 
@@ -48,7 +59,7 @@ npm start
 | Ерлан Қасымов | `erlan.k` | `okushy2024` | оқушы |
 | Дана Сейітова | `dana.s` | `geo2024` | оқушы |
 
-Пайдаланушылар `localStorage` ішінде сақталады (`geoalemi_users`, `geoalemi_session`).
+Пайдаланушылар мен сессия `localStorage` ішінде сақталады (`geosayahat_users`, `geosayahat_session`). Ескі кілттерден (`geoalemi_*`) автоматты көшіру бар. Navbar-да аты жөні және **Шығу** көрсетіледі; бетті жаңартқаннан кейін сессия сақталады.
 
 ## Оқулық құрылымы
 
@@ -63,9 +74,10 @@ npm start
 ## Технологиялар
 
 - Next.js 14.2 · React 18 · TypeScript
-- Tailwind CSS (forest / earth / sky палитрасы)
+- Tailwind CSS (forest / earth / sky / horizon палитрасы)
 - lucide-react белгішелері
 - Source Serif 4 + Manrope қаріптері (Google Fonts)
+- Cloudflare Pages (`*.pages.dev`) — static `out/`
 
 ## Лицензия
 
